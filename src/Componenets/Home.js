@@ -86,16 +86,24 @@ const Home = () => {
         }
     }
 
+
     const handleAddTextareaButtonClick = () => {
-        const newData = [...textareaData, { title: '', text: '' }]
+        const firstTextarea = textareaData[textareaData.length - 1];
+        if (firstTextarea && firstTextarea.title === '' && firstTextarea.text === '') {
+            return;
+        }
+
+        const newData = [...textareaData, { title: '', text: '' }];
         setTextareaData(newData);
 
         if (userId) {
             firebase
                 .database()
-                .ref(`users/${userId}/textareaData`).set(newData);
+                .ref(`users/${userId}/textareaData`)
+                .set(newData);
         }
-    }
+    };
+
 
     const handleDeleteTextareaButtonClick = (index) => {
         const newData = [...textareaData]
@@ -109,6 +117,21 @@ const Home = () => {
                 .set(newData);
         }
     };
+
+
+    const handleDeleteAllTextareaButtonClick = (index) => {
+        const newData = [...textareaData]
+        newData.splice(index,)
+        setTextareaData(newData)
+
+        if (userId) {
+            firebase
+                .database()
+                .ref(`users/${userId}/textareaData`)
+                .set(newData)
+        }
+    }
+
 
     const renderTextarea = (data, index) => (
         <div className='noteContainer' key={index}>
@@ -135,7 +158,7 @@ const Home = () => {
             <div className='searchTwo'>
                 <div className='searchAndUsername'>
                     <button className='Btn one' onClick={handleAddTextareaButtonClick}>Add Note</button>
-                    <button className='Btn two' onClick={() => setTextareaData([])}>Delete All Notes</button>
+                    <button className='Btn two' onClick={handleDeleteAllTextareaButtonClick}>Delete All Notes</button>
                     <h3 >{context.user?.email ? context.user.email : ""}</h3>
                     <NavLink className='navlinked' onClick={() => { context.setUser(null) }} to='/'>Logout</NavLink>
                 </div>
