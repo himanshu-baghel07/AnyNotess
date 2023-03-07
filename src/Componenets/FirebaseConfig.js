@@ -1,5 +1,5 @@
 export default {
-    apiKey: "YOUR_API_KEY",
+    apiKey: "YOU_API_KEY",
     authDomain: "anynotes-manger.firebaseapp.com",
     databaseURL: "https://anynotes-manger-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "anynotes-manger",
