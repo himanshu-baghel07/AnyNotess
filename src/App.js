@@ -1,25 +1,22 @@
 import React, { useState } from 'react'
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 
+import './App.css'
 import Signin from './Componenets/Signin'
 import Header from './Componenets/Header'
-import './App.css'
 import Home from './Componenets/Home'
 import Signup from './Componenets/Signup'
 import ForgetPassword from './Componenets/ForgetPassword'
 import { UserContext } from './Context/UserContext'
+
 import FirebaseConfig from './Componenets/FirebaseConfig'
-
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.min.css'
-
-import "bootstrap/dist/css/bootstrap.min.css";
-
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth'
 
-firebase.initializeApp(FirebaseConfig)
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 
+import "bootstrap/dist/css/bootstrap.min.css";
+
+firebase.initializeApp(FirebaseConfig)
 
 const App = () => {
 
@@ -29,7 +26,6 @@ const App = () => {
   return (
     <div>
       <Router>
-        <ToastContainer />
         <UserContext.Provider value={{ user, setUser }}>
           <Header />
           <Routes>

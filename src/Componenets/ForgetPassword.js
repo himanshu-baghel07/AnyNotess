@@ -1,65 +1,84 @@
 import React, { useState } from 'react'
+
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth'
-import { toast } from 'react-toastify'
 
+import { Link, NavLink } from 'react-router-dom';
+import {
+    Card,
+    CardBody,
+    CardFooter,
+    CardHeader,
+    Col,
+    Container,
+    Form,
+    FormGroup,
+    Row
+} from 'reactstrap';
+import { Alert, Button, TextField } from '@mui/material';
 
 const ForgetPassword = () => {
 
     const [email, setEmail] = useState('');
-    const [setMessage] = useState('');
+    const [alert, setAlert] = useState({ message: '', severity: '' })
 
     const auth = firebase.auth();
 
     const sendPasswordResetEmail = (event) => {
         event.preventDefault();
         auth.sendPasswordResetEmail(email).then(() => {
-            setMessage('Password reset email sent.');
-            toast('Password reset email sent', {
-                type: "success"
+            setAlert({
+                message: 'Password reset Email sent',
+                severity: 'success'
             })
         }).catch((error) => {
-            setMessage(error.message);
-            if (error.code === 'auth/invalid-email') {
-                toast.error('Invalid email, Please try valid email')
-            }
-            else if (error.code === 'auth/internal-error') {
-                toast.error('Internal error, Please try valid email')
-            }
-            else {
-                toast.error('Email not found, Please try valid email')
-            }
+            setAlert({
+                message: 'Invalid Email, Enter correct Email',
+                severity: 'warning'
+            })
         });
     };
 
     return (
-        <div className='signin'>
-            <div className='leftBar'>
-                <div className='signinTab'>
-                    <div className='SigninTitle'>
-                        Forget Password
-                    </div>
-                    <div className='emailTab'>
-                        <input
-                            className='foregtinput'
-                            type='email'
-                            placeholder='Email'
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required />
-                    </div>
-                    <div className='loginButton'>
-                        <button className='forgetbtn' type='submit' onClick={sendPasswordResetEmail}>Reset Password</button>
-                    </div>
-                </div>
-            </div>
-            <div className='rightBar'>
-                <h1 className='banner'>Login</h1>
-                <p>Do you Want to go login page</p>
-                <a href='/' >Click Here to Login</a>
-            </div>
-        </div>
+        <Container fluid style={{ height: '89vh' }}>
+            <Row className='justify-content-center'>
+                <Col lg={4} className='offset-lg mt-5' >
+                    <Card className='shadow bg-body  rounded'>
+                        <Form onSubmit={sendPasswordResetEmail}>
+                            <CardHeader className='text-center h5'>Recover Password</CardHeader>
+                            <CardBody>
+                                <FormGroup>
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="Email"
+                                        type='email'
+                                        variant="outlined"
+                                        fullWidth={true}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </FormGroup>
+                                <FormGroup className='text-center'>
+                                    <Button type='submit' variant="contained">Reset Password</Button>
+                                </FormGroup>
+                                {alert.message && (
+                                    <Alert severity={alert.severity} onClose={() => setAlert({ message: '', severity: '' })}>
+                                        {alert.message}
+                                    </Alert>
+                                )}
+                            </CardBody>
+                            <CardFooter className="text-center mt-3">
+                                <NavLink tag={Link}
+                                    to="/"
+                                    className="fs-5 text-success"
+                                    style={{ textDecoration: 'none' }}>Go to Login Page</NavLink>
+                            </CardFooter>
+                        </Form>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
     )
 }
 export default ForgetPassword

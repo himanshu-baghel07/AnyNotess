@@ -1,16 +1,38 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import {
+    Link,
+    Navigate,
+    NavLink,
+    useNavigate
+} from 'react-router-dom';
+
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth'
-import { UserContext } from '../Context/UserContext';
-import { toast } from 'react-toastify';
 
+import { UserContext } from '../Context/UserContext';
+
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    Col,
+    Container,
+    Form,
+    FormGroup,
+    FormText,
+    Row
+} from 'reactstrap';
+
+import google from '../google.png'
+
+import { Alert, Button, TextField } from '@mui/material';
 
 const Signin = () => {
 
     const context = useContext(UserContext)
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [alert, setAlert] = useState({ message: '', severity: '' })
 
     const handleSignIn = () => {
         firebase
@@ -20,24 +42,43 @@ const Signin = () => {
                 console.log("Response", res)
                 context.setUser({ email: res.user?.email, uid: res.user?.uid })
                 localStorage.setItem('userEmail', res.user.email);
+                setAlert({
+                    message: 'Successfully login...',
+                    severity: 'success'
+                })
             })
             .catch(error => {
                 console.log(error);
                 if (email !== '' && password !== '') {
                     if (error.code === 'auth/wrong-password') {
-                        toast.error('Incorrect password. Please try again.');
+                        setAlert({
+                            message: 'Wrong Password, Enter correct password',
+                            severity: 'error'
+                        })
                     }
-                    else if (error.code === 'auth/invalid-email') {
-                        toast.error('Invalid email, Please try valid email')
+                    else if (error.code === 'auth/user-not-found') {
+                        setAlert({
+                            message: 'Email not found',
+                            severity: 'warning'
+                        });
                     }
-                    else if (error.code === 'auth/internal-error') {
-                        toast.error('Invalid email, Please try valid email')
-                    }
-                }
-                else {
-                    toast("Enter both email and password for Login", { type: "warning" })
                 }
             })
+    };
+
+    const handleSignInWithGoogle = () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        firebase
+            .auth()
+            .signInWithPopup(provider)
+            .then((res) => {
+                console.log("Response", res);
+                context.setUser({ email: res.user?.email, uid: res.user?.uid });
+                localStorage.setItem("userEmail", res.user.email);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     };
 
     const handleFormSubmit = e => {
@@ -65,52 +106,82 @@ const Signin = () => {
     }
 
     return (
-        <div className='signin'>
-            <div className='leftBar'>
-                <div className='signinTab'>
-                    <div className='SigninTitle'>
-                        Login to You Account
-                    </div>
-                    <div className='emailTab'>
-                        <input
-                            type='email'
-                            placeholder='Email'
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required />
-                    </div>
-                    <div className='passwordTab'>
-                        <input
-                            type='password'
-                            placeholder='Password'
-                            id="password"
-                            value={password}
-                            onKeyDown={handleKeyDown}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required />
-                    </div>
-                    <div className='loginButton'>
-                        <button type='submit' onClick={handleFormSubmit}>Login</button>
-                    </div>
-                    <div>
-                        <h2 class='or'>
-                            <span>Or</span>
-                        </h2>
-                    </div>
-                    <Link to='/forgetpassword' style={{ textDecoration: "none" }}>
-                        <p className='forgetPassword' style={{ textAlign: "center" }}>Forgotten Password?</p>
-                    </Link>
-                </div>
-            </div>
-            <div className='rightBar'>
-                <div className='rightbarinfo' >
-                    <h1 className='banner'>New Here?</h1>
-                    <p>SignUp and Create notes anywhere, anytime easily</p>
-                    <h2> <a href='/Signup' >Click to Sign up</a></h2>
-                </div>
-            </div>
-        </div>
+        <Container fluid style={{ height: '89vh' }}>
+            <Row className='justify-content-center'>
+                <Col lg={4} className='offset-lg mt-5' >
+                    <Card className='shadow bg-body  rounded'
+                        style={{
+                            backgroundColor: ' #ffff',
+                            opacity: 0.8,
+                            backgroundImage: ' radial-gradient(#444cf7 0.5px, transparent 0.5px), radial-gradient(#444cf7 0.5px, #ffff 0.5px)',
+                            backgroundSize: '20px 20px',
+                            backgroundPosition: '0 0,10px 10px'
+                        }}
+                    >
+                        <Form >
+                            <CardHeader className='text-center h5'>Sign-In Here</CardHeader>
+                            <CardBody>
+                                <FormGroup >
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="Email"
+                                        type='email'
+                                        variant="outlined"
+                                        fullWidth={true}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="Password"
+                                        type='password'
+                                        variant="outlined"
+                                        fullWidth={true}
+                                        value={password}
+                                        onKeyDown={handleKeyDown}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </FormGroup>
+                                <FormGroup className='d-flex justify-content-between' >
+                                    <NavLink
+                                        tag={Link}
+                                        to="/forgetpassword"
+                                        style={{ fontSize: '1rem', textDecoration: 'none' }}
+                                        className="fs-7 text-primary">
+                                        Forget Password
+                                    </NavLink>
+                                    <NavLink
+                                        tag={Link}
+                                        to="/signup"
+                                        style={{ fontSize: '1rem', textDecoration: 'none', wordWrap: 'break-word' }}
+                                        className="far me-1 ">
+                                        Create an account
+                                    </NavLink>
+                                </FormGroup>
+                                {alert.message && (
+                                    <Alert severity={alert.severity} onClose={() => setAlert({ message: '', severity: '' })}>
+                                        {alert.message}
+                                    </Alert>
+                                )}
+                                <FormGroup className='text-center'>
+                                    <Button onClick={handleFormSubmit} variant="contained">Sign-In</Button>
+                                </FormGroup>
+                                <FormGroup className='h5 text-center'>
+                                    <FormText>Or</FormText>
+                                </FormGroup>
+                                <FormGroup className='text-center'>
+                                    <img src={google} onClick={handleSignInWithGoogle} style={{ cursor: 'pointer' }} alt='googleimage' />
+                                </FormGroup>
+                            </CardBody>
+                        </Form>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
     )
 }
 export default Signin

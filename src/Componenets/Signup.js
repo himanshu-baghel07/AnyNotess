@@ -1,18 +1,36 @@
 import React, { useContext, useState } from 'react'
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate, NavLink } from 'react-router-dom';
+
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth'
 
+import {
+    Card,
+    CardBody,
+    CardFooter,
+    CardHeader,
+    Col,
+    Container,
+    Form,
+    FormGroup,
+    Row
+} from 'reactstrap';
+
+import {
+    Alert,
+    Button,
+    TextField
+} from '@mui/material';
+
 import { UserContext } from '../Context/UserContext';
-
-import { toast } from 'react-toastify'
-
+import { FaSignInAlt } from 'react-icons/fa';
 
 const Signup = () => {
 
     const context = useContext(UserContext)
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [alert, setAlert] = useState({ message: '', severity: '' })
 
     const handleSignUp = () => {
         firebase
@@ -24,23 +42,11 @@ const Signup = () => {
             })
             .catch(error => {
                 console.log(error);
-
-                if (email !== '' && password !== '') {
-                    if (error.code === 'auth/wrong-password') {
-                        toast.error('Incorrect password. Please try again.');
-                    }
-                    else if (error.code === 'auth/invalid-email') {
-                        toast.error('Invalid email, Please try valid email')
-                    }
-                    else if (error.code === 'auth/internal-error') {
-                        toast.error('Invalid email, Please try valid email')
-                    }
-                    else if (error.code === 'auth/email-already-in-use') {
-                        toast.error("Emial is already taken")
-                    }
-                }
-                else {
-                    toast("Enter both email and password for Signup", { type: "warning" })
+                if (error.code === 'auth/email-already-in-use') {
+                    setAlert({
+                        message: 'Email is already taken',
+                        severity: 'warning'
+                    })
                 }
             })
     };
@@ -61,42 +67,59 @@ const Signup = () => {
     }
 
     return (
-        <div className='signin'>
-            <div className='leftBar'>
-                <div className='signinTab'>
-                    <div className='SigninTitle'>
-                        Sign up Here
-                    </div>
-                    <div className='emailTab'>
-                        <input
-                            type='email'
-                            placeholder='Email'
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required />
-                    </div>
-                    <div className='passwordTab'>
-                        <input
-                            type='password'
-                            placeholder='Password'
-                            id="password"
-                            value={password}
-                            onKeyDown={handleKeyDown}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required />
-                    </div>
-                    <div className='loginButton'>
-                        <button type='submit' onClick={handleFormSubmit}>Sign up</button>
-                    </div>
-                </div>
-            </div>
-            <div className='rightBar'>
-                <h1 className='banner'>Old Forks?</h1>
-                <p>If you are Existing User then go for login page</p>
-                <a href='/' >Click Here to Login</a>
-            </div>
-        </div>
+        <Container fluid style={{ height: '89vh' }}>
+            <Row className='justify-content-center'>
+                <Col lg={4} className='offset-lg mt-5' >
+                    <Card className='shadow bg-body  rounded'>
+                        <Form onSubmit={handleFormSubmit}>
+                            <CardHeader style={{ fontSize: '1.5rem' }} className='text-center'>Sign Up</CardHeader>
+                            <CardBody>
+                                <FormGroup >
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="Email"
+                                        type='email'
+                                        variant="outlined"
+                                        fullWidth={true}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <TextField
+                                        id="outlined-basic"
+                                        label="Password"
+                                        type='password'
+                                        variant="outlined"
+                                        fullWidth={true}
+                                        value={password}
+                                        onKeyDown={handleKeyDown}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </FormGroup>
+                                <FormGroup className='text-center'>
+                                <NavLink tag={Link} to="/" className="fs-5 text-primary" style={{textDecoration:'none'}}>
+                                    Go to Sign-In Page
+                                </NavLink>
+                                </FormGroup>
+                                {alert.message && (
+                                    <Alert severity={alert.severity} onClose={() => setAlert({ message: '', severity: '' })}>
+                                        {alert.message}
+                                    </Alert>
+                                )}
+
+                               
+                            </CardBody>
+                            <CardFooter className="text-center mt-3">
+                                <Button type='submit' style={{ backgroundColor: 'green' }} variant="contained">Sign Up</Button>
+                            </CardFooter>
+                        </Form>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
     )
 }
 export default Signup
