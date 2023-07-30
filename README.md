@@ -6,7 +6,7 @@ It is note taking web app.
 
 In this app you can create note on one device and check note on other device using login into your account.
 
-[Visit App](https://anynotes.web.app/)
+[Visit App](https://anynotess.web.app/)
 
-![Notes taking app](https://i.postimg.cc/wxN1snNH/Screenshot-2023-03-03-154027.jpg)
+![Notes taking app](https://i.postimg.cc/SsFpZsF3/Any-Notess.jpg)
 
